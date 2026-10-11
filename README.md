@@ -5,6 +5,7 @@ MAO provides model service access for Agent Teams.
 | Layer | Responsibility |
 | --- | --- |
 | Agent Team | Business tasks, role collaboration, and feedback |
+| ATF | Task execution, context checkpoints, dependency scheduling, and recovery |
 | MAO | Request construction, invocation style, and normalized results |
 | MSCP | Model resource acquisition and release |
 | Connector | Provider protocol adaptation |
@@ -20,6 +21,7 @@ Team. Access configuration describes capabilities; it does not define roles.
 - Ordinary and streaming access through an injected backend.
 - An MSCP adapter that borrows, uses, and returns guarded leases.
 - Access-layer errors for resource availability, capacity, and timeouts.
+- Detached response snapshots for caller-owned task checkpoints.
 - A business-only team example with a bounded review/revision feedback cycle.
 
 ## Access
@@ -70,8 +72,13 @@ ruff check --config pyproject.toml .
 PYTHONPATH=src:../model-service-connector-pool/src pytest
 ```
 
-The current MSCP is an embedded pool for one asyncio event loop. A shared
-institutional service and a larger framework container are future work.
+The companion [Agent Task Framework](https://github.com/ming616/Agent-Task-Framework)
+provides a task runtime and Agent scopes. Its proposal prototype combines
+parallel work, dependency joins, bounded feedback, and SQLite recovery with MAO
+and MSCP. See [the three-project guide](docs/framework-prototype.md).
+
+MSCP remains an embedded pool for one asyncio event loop; an institutional
+shared service is future work.
 
 CI runs MAO's independent tests on Python 3.10, 3.11, and 3.12. MSCP integration
 tests run locally when the paired source is on the Python path. The optional

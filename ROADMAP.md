@@ -11,7 +11,8 @@ resource acquisition and release.
 - Combination of role, task, and explicit capability requirements.
 - Ordinary and context-managed streaming access.
 - MSCP adapter with acquisition and invocation timeouts.
-- Access errors and preserved request metadata.
+- Access errors, preserved request metadata, and detached response snapshots.
+- Integration with ATF task checkpoints and Agent scopes.
 - Independent business-only Agent classes and bounded feedback example.
 - Two teams sharing one embedded pool.
 - An environment-configured HTTP endpoint example.
@@ -27,7 +28,7 @@ resource acquisition and release.
 
 - Add a remote adapter when MSCP's institutional shared service is defined.
 - Extract common configuration and composition from multiple applications.
-- Define framework lifecycle boundaries for Agents, MAO, and shared resources.
+- Validate ATF lifecycle boundaries for Agents, MAO, and shared resources.
 
-No new framework repository, package release, or source archive is scheduled
-in this phase.
+ATF is now the companion framework repository. Package index releases and
+source archives have not been published in this phase.

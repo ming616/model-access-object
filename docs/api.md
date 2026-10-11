@@ -13,6 +13,11 @@ requirement=None, metadata={})` describes one access request.
 usage={}, metadata={})` is returned for ordinary calls and for each stream chunk.
 Streaming content is a delta; concatenate content to assemble text.
 
+`response.to_dict()` produces a detached dataclass value snapshot, including
+nested usage and metadata. ATF or the application can save this value in a
+checkpoint. The response object does not store history itself. Custom metadata
+must be JSON-compatible if the caller intends to persist it as JSON.
+
 Request metadata stays in the access layer. When provided, it is copied into
 response metadata under `request_metadata`; it is not sent as a provider
 parameter.
