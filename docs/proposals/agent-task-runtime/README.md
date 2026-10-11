@@ -1,3 +1,5 @@
+> **项目已迁移：** 后续设计与实现统一在 [Agent Task Framework（ATF）](https://github.com/ming616/Agent-Task-Framework) 维护。本目录保留早期筹备材料，当前职责边界、接口草案和建设路线请以 ATF 仓库为准。
+
 # Agent Task Runtime
 
 Task context persistence, execution recovery, and Agent instance composition for Agent Teams.
