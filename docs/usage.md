@@ -12,6 +12,18 @@ The core example requires only Python 3.10 or newer. Source development can also
 use `pip install -e ../model-service-connector-pool` and `pip install -e .`.
 No published distribution is required.
 
+## CI and Paired Tests
+
+MAO's unit tests run independently. Without the companion source, pytest reports
+the MSCP integration module as skipped. With the source path above, the full suite
+includes the paired integration tests.
+
+The optional CI integration job pins a compatible MSCP commit. Set repository
+variable `ENABLE_MSCP_INTEGRATION=true` to enable it. When the companion repository
+is private, provide secret `MSCP_READ_TOKEN` with read access to that repository.
+The default Actions token does not grant access to another private repository. The
+integration job runs on trusted pushes or manual dispatch, not pull requests.
+
 ## Composition and Injection
 
 Configure a registry and one MSCP pool in application startup code. Create an

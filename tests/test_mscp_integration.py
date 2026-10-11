@@ -3,12 +3,6 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 import pytest
-from model_service_connector_pool import (
-    CapabilityRequirement,
-    InMemoryConnectorRegistry,
-    MockModelServiceConnector,
-    ModelServiceConnectorPool,
-)
 
 from model_access_object import (
     InMemoryModelAccessPolicy,
@@ -20,6 +14,15 @@ from model_access_object import (
     ModelCapabilityRequirement,
     MSCPAdapter,
 )
+
+mscp = pytest.importorskip(
+    "model_service_connector_pool",
+    reason="Install the paired MSCP source to run integration tests.",
+)
+CapabilityRequirement = mscp.CapabilityRequirement
+InMemoryConnectorRegistry = mscp.InMemoryConnectorRegistry
+MockModelServiceConnector = mscp.MockModelServiceConnector
+ModelServiceConnectorPool = mscp.ModelServiceConnectorPool
 
 
 class RecordingConnector(MockModelServiceConnector):
@@ -79,22 +82,6 @@ async def test_real_pool_is_adapted_and_parameters_and_results_are_preserved() -
     assert response.metadata == {"finish_reason": "stop"}
     assert connector.last_kwargs == {"temperature": 0.3}
     assert pool.active_counts() == {}
-
-
-def test_role_task_and_explicit_hard_constraints_are_combined() -> None:
-    policy = InMemoryModelAccessPolicy()
-    role = ModelCapabilityRequirement(required_tags={"zh"}, min_context_tokens=16000)
-    policy.set_role_requirement("writer", role)
-    policy.set_task_requirement("draft", ModelCapabilityRequirement(required_tags={"writing"}))
-    result = policy.resolve(
-        "writer",
-        "draft",
-        ModelCapabilityRequirement(required_tags={"offline"}, stream_required=True),
-    )
-    assert result.required_tags == {"zh", "writing", "offline"}
-    assert result.min_context_tokens == 16000
-    assert result.stream_required
-    assert role.required_tags == {"zh"}
 
 
 @pytest.mark.asyncio

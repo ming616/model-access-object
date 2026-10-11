@@ -5,6 +5,10 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -21,13 +25,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Checkout compatible MSCP
-        uses: actions/checkout@v4
-        with:
-          repository: ming616/model-service-connector-pool
-          ref: 9b98f37e1429d10050a8e985c615a6a4e2c72722
-          path: .deps/model-service-connector-pool
-
       - name: Install
         run: |
           python -m pip install --upgrade pip
@@ -37,7 +34,36 @@ jobs:
         run: ruff check --config pyproject.toml src tests examples
 
       - name: Test
+        run: pytest
+
+  integration:
+    if: vars.ENABLE_MSCP_INTEGRATION == 'true' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout MAO
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Checkout compatible MSCP
+        uses: actions/checkout@v4
+        with:
+          repository: ming616/model-service-connector-pool
+          ref: 9b98f37e1429d10050a8e985c615a6a4e2c72722
+          token: ${{ secrets.MSCP_READ_TOKEN || github.token }}
+          persist-credentials: false
+          path: .deps/model-service-connector-pool
+
+      - name: Install
+        run: pip install -e ".[dev]"
+
+      - name: Integration test
         env:
           PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}/.deps/model-service-connector-pool/src
-        run: pytest
+        run: |
+          python -c "import model_service_connector_pool"
+          pytest tests/test_mscp_integration.py
 

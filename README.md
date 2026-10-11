@@ -73,6 +73,10 @@ PYTHONPATH=src:../model-service-connector-pool/src pytest
 The current MSCP is an embedded pool for one asyncio event loop. A shared
 institutional service and a larger framework container are future work.
 
+CI runs MAO's independent tests on Python 3.10, 3.11, and 3.12. MSCP integration
+tests run locally when the paired source is on the Python path. The optional
+cross-repository CI job is configured separately; see the usage guide.
+
 ## License
 
 Apache-2.0
