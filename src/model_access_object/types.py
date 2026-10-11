@@ -11,6 +11,10 @@ class ModelCapabilityRequirement:
     min_context_tokens: int = 0
     stream_required: bool = False
 
+    def __post_init__(self) -> None:
+        if self.min_context_tokens < 0:
+            raise ValueError("min_context_tokens must be non-negative.")
+
 
 @dataclass(frozen=True)
 class ModelAccessRequest:

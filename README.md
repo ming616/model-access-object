@@ -1,50 +1,33 @@
 # Model Access Object
 
-`model-access-object` provides an application-facing model access layer for
-agentic systems.
+MAO provides model service access for Agent Teams.
 
-It is designed to work with a Model Service Connector Pool (MSCP), but its
-responsibility is different:
-
-- Agent Teams manage business workflows.
-- MAO translates business model-access needs into model-access requests.
-- MSCP manages model service connector acquisition, leasing, routing, and
-  release.
-
-## Why
-
-In traditional Spring-style information systems, the application service or
-manager layer should not directly handle database connection details. Instead,
-it calls DAO objects, and DAO objects rely on connection pools such as DBCP or
-HikariCP.
-
-Agentic applications need a similar layer:
-
-| Spring Information System | Agentic Intelligent System |
+| Layer | Responsibility |
 | --- | --- |
-| Controller | Task/API entry |
-| Manager / Service | Agent Team / Task Orchestrator |
-| DAO | MAO: Model Access Object |
-| DBCP / HikariCP | MSCP: Model Service Connector Pool |
-| JDBC Driver | Model Connector / Adapter |
-| Database | Model Service / LLM Endpoint |
+| Agent Team | Business tasks, role collaboration, and feedback |
+| MAO | Request construction, invocation style, and normalized results |
+| MSCP | Model resource acquisition and release |
+| Connector | Provider protocol adaptation |
 
-## Architecture
+This follows the separation used by service objects, DAOs, and connection pools
+in layered applications. Business prompts and collaboration remain with Agent
+Team. Access configuration describes capabilities; it does not define roles.
 
-```mermaid
-flowchart TD
-    A["Task Entry"] --> B["Agent Team"]
-    B --> C["MAO"]
-    C --> D["MSCP"]
-    D --> E["ModelServiceConnector"]
-    E --> F["Model Service"]
-```
+## Current Core
 
-## Core Idea
+- Model access requests and normalized responses.
+- Combination of role, task, and explicit capability requirements.
+- Ordinary and streaming access through an injected backend.
+- An MSCP adapter that borrows, uses, and returns guarded leases.
+- Access-layer errors for resource availability, capacity, and timeouts.
+- A business-only team example with a bounded review/revision feedback cycle.
 
-Agent Team code should express business intent:
+## Access
 
 ```python
+from model_access_object import ModelAccessObject, MSCPAdapter
+
+mao = ModelAccessObject(MSCPAdapter(pool, acquire_timeout=5))
 response = await mao.chat(
     agent_id="writer-01",
     role="writer",
@@ -53,15 +36,42 @@ response = await mao.chat(
 )
 ```
 
-MAO maps this request into a model capability requirement and delegates the
-actual connector acquisition to MSCP.
+The application composition code constructs the pool, MAO, and Agent instances.
+Agents receive MAO through their constructors. Success, errors, cancellation,
+and early stream closure all return the borrowed capacity.
+
+## Run From Source
+
+Clone this repository and
+[model-service-connector-pool](https://github.com/ming616/model-service-connector-pool)
+as sibling directories. From this repository:
+
+```bash
+PYTHONPATH=src:../model-service-connector-pool/src python examples/layered_team.py
+```
+
+This offline demo runs two teams against the same pool. Each writer receives
+review feedback and produces a revision. The final active lease count is empty.
+For an actual configured endpoint, see `examples/openai_compatible.py`.
 
 ## Documentation
 
+- [Layered Architecture (Chinese)](docs/architecture.zh-CN.md)
 - [Concepts](docs/concepts.md)
 - [Usage Guide](docs/usage.md)
 - [API Reference](docs/api.md)
 - [Roadmap](ROADMAP.md)
+
+## Development
+
+```bash
+pip install -e ".[dev]"
+ruff check --config pyproject.toml .
+PYTHONPATH=src:../model-service-connector-pool/src pytest
+```
+
+The current MSCP is an embedded pool for one asyncio event loop. A shared
+institutional service and a larger framework container are future work.
 
 ## License
 

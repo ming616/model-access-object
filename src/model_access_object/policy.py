@@ -28,10 +28,18 @@ class InMemoryModelAccessPolicy:
         task_type: str,
         explicit: ModelCapabilityRequirement | None = None,
     ) -> ModelCapabilityRequirement:
-        if explicit is not None:
-            return explicit
-        if task_type in self._task_requirements:
-            return self._task_requirements[task_type]
-        if role in self._role_requirements:
-            return self._role_requirements[role]
-        return ModelCapabilityRequirement()
+        requirements = [
+            item
+            for item in (
+                self._role_requirements.get(role),
+                self._task_requirements.get(task_type),
+                explicit,
+            )
+            if item is not None
+        ]
+        return ModelCapabilityRequirement(
+            required_tags=set().union(*(item.required_tags for item in requirements)),
+            preferred_tags=set().union(*(item.preferred_tags for item in requirements)),
+            min_context_tokens=max((item.min_context_tokens for item in requirements), default=0),
+            stream_required=any(item.stream_required for item in requirements),
+        )

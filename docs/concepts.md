@@ -1,47 +1,34 @@
 # Concepts
 
-## MAO
+## Responsibilities
 
-MAO means `Model Access Object`.
+Agent Team defines business goals, roles, collaboration, and feedback.
+MAO defines how an Agent uses model services: access requirements, request
+construction, ordinary or streaming invocation, and normalized results.
+MSCP defines how available model resources are acquired and returned.
 
-It is an application-facing model access layer for agentic systems. It plays a
-role similar to DAO in traditional information systems.
+The optional MSCP adapter is part of MAO. It translates contracts and performs
+access operations using MSCP's leases. Provider connectors implement wire
+protocols below the resource boundary.
 
-## Responsibility
+## Application-Owned Policy
 
-MAO should handle:
+A role-to-capability policy is access configuration supplied by the application.
+It neither defines business roles nor assigns tasks. Policies combine hard
+constraints before resource acquisition.
 
-- role-to-model-capability mapping
-- task-to-model-capability mapping
-- model access request construction
-- request and response normalization
-- delegation to MSCP
+Business instructions, tools, feedback decisions, and collaboration graphs remain
+with Agent Team. Independent memory and storage services supply persistent data.
 
-MAO should not handle:
+## Runtime Objects
 
-- low-level provider protocol details
-- connector health checks
-- connector leasing
-- connector concurrency accounting
-- model endpoint lifecycle
+Roles are design-time definitions. Agent instances execute actual tasks and
+receive MAO through constructor injection. Instances acquire no permanent model
+binding. MAO borrows a lease for each access operation and returns it afterwards.
 
-Those are MSCP responsibilities.
+## Framework Direction
 
-## Layering
-
-```text
-Task Entry
-  -> Agent Team
-  -> MAO
-  -> MSCP
-  -> ModelServiceConnector
-  -> Model Service
-```
-
-## Key Boundary
-
-Agent Team expresses business intent.
-
-MAO translates business intent into model access requirements.
-
-MSCP selects and leases concrete model service connectors.
+A larger framework can add common configuration, component composition, and
+lifecycle management around these interfaces. Current examples use explicit
+constructor injection. A general container is future work to be extracted from
+application experience.

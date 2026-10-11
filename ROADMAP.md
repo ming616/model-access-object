@@ -1,36 +1,33 @@
 # Roadmap
 
-## Phase 0: Core MAO Contract
+## Principle
 
-- Define model access request and response objects
-- Define model capability requirements
-- Define role and task policy mapping
-- Define MAO execution flow
+Agent Team owns business logic. MAO owns model service access. MSCP owns
+resource acquisition and release.
 
-Status: initial version available.
+## Available
 
-## Phase 1: MSCP Adapter
+- Access request and normalized response contracts.
+- Combination of role, task, and explicit capability requirements.
+- Ordinary and context-managed streaming access.
+- MSCP adapter with acquisition and invocation timeouts.
+- Access errors and preserved request metadata.
+- Independent business-only Agent classes and bounded feedback example.
+- Two teams sharing one embedded pool.
+- An environment-configured HTTP endpoint example.
 
-- Add an adapter for `model-service-connector-pool`
-- Convert MAO requirements to MSCP capability requirements
-- Convert MSCP connector responses to MAO responses
+## Next: Validate Real Applications
 
-## Phase 2: Prompt and Task Policies
+- Exercise the access contract against deployed local model services.
+- Keep business prompts and collaboration in application repositories.
+- Refine structured output and tool-call access contracts from actual use.
+- Add optional source integration instructions for additional backends.
 
-- Add prompt policy hooks
-- Add role-specific defaults
-- Add task-specific overrides
-- Add policy loading from YAML
+## Next: Shared Service and Framework Composition
 
-## Phase 3: Observability
+- Add a remote adapter when MSCP's institutional shared service is defined.
+- Extract common configuration and composition from multiple applications.
+- Define framework lifecycle boundaries for Agents, MAO, and shared resources.
 
-- Add request tracing hooks
-- Add usage metadata
-- Add model selection metadata
-- Add task-level audit fields
-
-## Phase 4: Agent Team Examples
-
-- Proposal writing team example
-- Code review team example
-- Data analysis team example
+No new framework repository, package release, or source archive is scheduled
+in this phase.
