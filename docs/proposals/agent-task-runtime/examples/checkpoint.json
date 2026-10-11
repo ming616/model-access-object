@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "task_id": "proposal-demo-001",
+  "team_key": "proposal-writing",
+  "definition_version": "1",
+  "revision": 3,
+  "status": "paused",
+  "input": {
+    "topic": "智能软件研发教学案例"
+  },
+  "context": {
+    "shared": {
+      "draft": "初稿：通过角色协作完成教学案例申报材料。",
+      "draft_version": 1,
+      "review_comments": []
+    },
+    "actors": {
+      "writer-main": {
+        "history": [
+          {
+            "kind": "task_input",
+            "content": "撰写教学案例申报材料初稿。"
+          },
+          {
+            "kind": "output",
+            "content": "初稿：通过角色协作完成教学案例申报材料。"
+          }
+        ]
+      },
+      "reviewer-main": {
+        "history": []
+      }
+    },
+    "memory": [
+      {
+        "kind": "constraint",
+        "content": "审阅时检查目标、实施步骤和可量化成效。",
+        "source": "task_input"
+      }
+    ]
+  },
+  "pending_work": [
+    {
+      "work_id": "review-1",
+      "role": "reviewer",
+      "context_key": "reviewer-main",
+      "input": {
+        "draft_version": 1
+      }
+    }
+  ],
+  "completed_work": [
+    {
+      "work_id": "draft-1",
+      "role": "writer",
+      "context_key": "writer-main",
+      "output": {
+        "draft_version": 1
+      }
+    }
+  ],
+  "inflight": null
+}
