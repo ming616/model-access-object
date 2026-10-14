@@ -2,6 +2,8 @@
 
 ## Principle
 
+The shared direction is recorded in [Overall Framework Goals](https://github.com/ming616/Agent-Task-Framework/blob/main/docs/framework-goals.zh-CN.md).
+
 Agent Team owns business logic. MAO owns model service access. MSCP owns
 resource acquisition and release.
 
