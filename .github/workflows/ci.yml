@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ming616/model-service-connector-pool
-          ref: 7dd04f497962ac5ce52baa0de0c33f036ae0cbe3
+          ref: be3d6f14e32702fec7ce93970314a0f15f7f0bd1
           token: ${{ secrets.MSCP_READ_TOKEN || github.token }}
           persist-credentials: false
           path: .deps/model-service-connector-pool
