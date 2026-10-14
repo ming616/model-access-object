@@ -60,6 +60,7 @@ For an actual configured endpoint, see `examples/openai_compatible.py`.
 ## Documentation
 
 - [Overall Framework Goals (Chinese)](https://github.com/ming616/Agent-Task-Framework/blob/main/docs/framework-goals.zh-CN.md)
+- [Agentic Container Design and Prototype (Chinese)](https://github.com/ming616/Agent-Task-Framework/blob/main/docs/agentic-container.zh-CN.md)
 - [Layered Architecture (Chinese)](docs/architecture.zh-CN.md)
 - [Concepts](docs/concepts.md)
 - [Usage Guide](docs/usage.md)
