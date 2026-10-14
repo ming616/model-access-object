@@ -25,6 +25,36 @@ MockModelServiceConnector = mscp.MockModelServiceConnector
 ModelServiceConnectorPool = mscp.ModelServiceConnectorPool
 
 
+async def test_shared_backend_group_through_mao():
+    registry = InMemoryConnectorRegistry()
+    for name in ("writer", "reviewer"):
+        registry.register(MockModelServiceConnector(name, capabilities={name}))
+    async with ModelServiceConnectorPool(
+        registry,
+        connector_groups={"writer": "gpu", "reviewer": "gpu"},
+        group_limits={"gpu": 1},
+    ) as pool:
+        mao = ModelAccessObject(MSCPAdapter(pool))
+        async with pool.acquire("holder", CapabilityRequirement(required_tags={"writer"})):
+            with pytest.raises(ModelAccessBusyError):
+                await mao.chat(
+                    "reviewer",
+                    "reviewer",
+                    "review",
+                    [],
+                    requirement=ModelCapabilityRequirement(required_tags={"reviewer"}),
+                )
+        response = await mao.chat(
+            "reviewer",
+            "reviewer",
+            "review",
+            [],
+            requirement=ModelCapabilityRequirement(required_tags={"reviewer"}),
+        )
+        assert response.connector_id == "reviewer"
+        assert pool.active_counts() == pool.active_group_counts() == {}
+
+
 class RecordingConnector(MockModelServiceConnector):
     def __init__(self) -> None:
         super().__init__("writer", capabilities={"zh", "writing"}, max_context_tokens=32000)
