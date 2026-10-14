@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
 from dataclasses import replace
+from copy import deepcopy
 from typing import Any, Protocol
 
 from .policy import InMemoryModelAccessPolicy
@@ -55,7 +56,7 @@ class ModelAccessObject:
             task_type=task_type,
             messages=messages,
             requirement=requirement,
-            metadata=dict(metadata or {}),
+            metadata=deepcopy(metadata or {}),
         )
         return await self.execute(request, **kwargs)
 
@@ -64,6 +65,7 @@ class ModelAccessObject:
         request: ModelAccessRequest,
         **kwargs: Any,
     ) -> ModelAccessResponse:
+        metadata = deepcopy(request.metadata)
         requirement = self._policy.resolve(
             role=request.role,
             task_type=request.task_type,
@@ -75,7 +77,7 @@ class ModelAccessObject:
             messages=request.messages,
             **kwargs,
         )
-        return self._with_metadata(response, request.metadata)
+        return self._with_metadata(response, metadata)
 
     @asynccontextmanager
     async def stream(
@@ -89,6 +91,7 @@ class ModelAccessObject:
         metadata: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> AsyncIterator[AsyncIterator[ModelAccessResponse]]:
+        metadata_snapshot = deepcopy(metadata or {})
         resolved = self._policy.resolve(role, task_type, requirement)
         resolved = replace(resolved, stream_required=True)
         stream_method = getattr(self._connector_pool, "stream_with_requirement", None)
@@ -97,7 +100,7 @@ class ModelAccessObject:
                 "The configured model access backend does not support streaming."
             )
         async with stream_method(agent_id, resolved, messages, **kwargs) as chunks:
-            yield self._stream_metadata(chunks, metadata or {})
+            yield self._stream_metadata(chunks, metadata_snapshot)
 
     @staticmethod
     def _with_metadata(
@@ -105,7 +108,7 @@ class ModelAccessObject:
     ) -> ModelAccessResponse:
         if not metadata:
             return response
-        return replace(response, metadata={**response.metadata, "request_metadata": dict(metadata)})
+        return replace(response, metadata={**response.metadata, "request_metadata": deepcopy(metadata)})
 
     async def _stream_metadata(
         self, chunks: AsyncIterator[ModelAccessResponse], metadata: dict[str, Any]

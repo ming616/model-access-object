@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -7,6 +8,7 @@ from model_access_object import (
     InMemoryModelAccessPolicy,
     ModelAccessObject,
     ModelAccessResponse,
+    ModelAccessRequest,
     ModelCapabilityRequirement,
 )
 
@@ -112,3 +114,42 @@ async def test_streaming_is_explicitly_unsupported_by_chat_only_backend() -> Non
     with pytest.raises(NotImplementedError):
         async with mao.stream("agent", "writer", "draft", []):
             pass
+
+
+async def test_execute_snapshots_event_metadata_before_waiting():
+    started, release = asyncio.Event(), asyncio.Event()
+
+    class Backend(RecordingConnectorPool):
+        async def invoke_with_requirement(self, *args, **kwargs):
+            started.set()
+            await release.wait()
+            return ModelAccessResponse("answer")
+
+    metadata = {"event": {"id": "materials-1"}}
+    request = ModelAccessRequest("a", "facts", "proposal", [], metadata=metadata)
+    operation = asyncio.create_task(ModelAccessObject(Backend()).execute(request))
+    await asyncio.wait_for(started.wait(), 1)
+    metadata["event"]["id"] = "changed"
+    release.set()
+    response = await operation
+    assert response.metadata["request_metadata"]["event"]["id"] == "materials-1"
+
+
+async def test_stream_metadata_detached_from_caller_and_other_chunks():
+    class Backend(RecordingConnectorPool):
+        @asynccontextmanager
+        async def stream_with_requirement(self, *args, **kwargs):
+            async def chunks():
+                yield ModelAccessResponse("first")
+                yield ModelAccessResponse("second")
+
+            yield chunks()
+
+    metadata = {"event": {"id": "approval-1"}}
+    mao = ModelAccessObject(Backend())
+    async with mao.stream("a", "writer", "proposal", [], metadata=metadata) as chunks:
+        metadata["event"]["id"] = "caller mutation"
+        first = await anext(chunks)
+        first.metadata["request_metadata"]["event"]["id"] = "chunk mutation"
+        second = await anext(chunks)
+        assert second.metadata["request_metadata"]["event"]["id"] == "approval-1"

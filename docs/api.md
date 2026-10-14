@@ -94,3 +94,10 @@ call through MAO instead.
 All derive from `ModelAccessError(RuntimeError)`; timeout also derives from
 `TimeoutError`. Underlying exceptions are retained as causes. Cancellation and
 business exceptions propagate without being converted into access failures.
+## Request metadata isolation
+
+MAO captures a deep snapshot of request metadata before waiting for a backend.
+Streaming captures metadata at context entry and gives each chunk its own copy.
+Nested caller or chunk mutations cannot alter another response's correlation
+values. Applications may include task/work/attempt and human event identifiers;
+MAO does not interpret approval decisions or persist events.

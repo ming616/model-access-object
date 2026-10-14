@@ -57,3 +57,10 @@ one event loop; a remote shared pool remains future work.
 
 MAO 0.1.0 source in this revision includes `ModelAccessResponse.to_dict()`, used
 by the ATF example. ATF's integration CI pins compatible companion commits.
+## Human event continuation
+
+ATF now provides a `--human` proposal example with durable materials and approval
+waits. Agents pass the accepted event ID through MAO request metadata; MAO captures
+nested values before backend waiting and isolates each stream chunk. Waiting tasks
+hold no model leases. See the [ATF event guide](https://github.com/ming616/Agent-Task-Framework/blob/main/docs/human-events.zh-CN.md)
+for commands and the idle-task submission boundary.

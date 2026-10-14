@@ -22,6 +22,7 @@ Team. Access configuration describes capabilities; it does not define roles.
 - An MSCP adapter that borrows, uses, and returns guarded leases.
 - Access-layer errors for resource availability, capacity, and timeouts.
 - Detached response snapshots for caller-owned task checkpoints.
+- Nested request metadata isolation during access waiting and across streamed chunks.
 - A business-only team example with a bounded review/revision feedback cycle.
 
 ## Access

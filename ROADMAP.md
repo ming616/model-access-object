@@ -12,6 +12,7 @@ resource acquisition and release.
 - Ordinary and context-managed streaming access.
 - MSCP adapter with acquisition and invocation timeouts.
 - Access errors, preserved request metadata, and detached response snapshots.
+- Deep request metadata snapshots, including event correlation across capacity waits and chunks.
 - Integration with ATF task checkpoints and Agent scopes.
 - Independent business-only Agent classes and bounded feedback example.
 - Two teams sharing one embedded pool.
